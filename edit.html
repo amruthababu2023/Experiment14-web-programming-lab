@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit Record - Flask CRUD</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background-color: #f6f5f0;
+      color: #2b3440;
+      padding: 36px 16px;
+    }
+
+    .container {
+      max-width: 540px;
+      margin: 0 auto;
+    }
+
+    .panel {
+      background-color: #ffffff;
+      border: 1px solid #e2e6ea;
+      border-radius: 14px;
+      padding: 24px 28px;
+      box-shadow: 0 4px 14px rgba(43, 52, 64, 0.05);
+    }
+
+    h1 {
+      font-size: 1.45rem;
+      color: #1f3a2d;
+      margin-bottom: 6px;
+    }
+
+    p.sub {
+      font-size: 0.9rem;
+      color: #64748b;
+      margin-bottom: 18px;
+    }
+
+    .alert-error {
+      background-color: #fbe7e5;
+      color: #84251d;
+      border: 1px solid #f2b8b2;
+      padding: 11px 14px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: #475569;
+      margin-bottom: 6px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      background-color: #fafaf8;
+      color: #1e293b;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #6b9ac4;
+      background-color: #ffffff;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .btn-save {
+      flex: 1;
+      padding: 10px 16px;
+      background-color: #2f5d46;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-save:hover {
+      background-color: #254a38;
+    }
+
+    .btn-cancel {
+      text-decoration: none;
+      padding: 10px 16px;
+      background-color: #edf2f7;
+      color: #334155;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .btn-cancel:hover {
+      background-color: #e2e8f0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="panel">
+      <h1>Update Record #{{ record["id"] }}</h1>
+      <p class="sub">Modify the student details and save changes to SQLite.</p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST" action="{{ url_for('edit_record', record_id=record['id']) }}">
+        <div class="form-group">
+          <label for="student_name">Student Name</label>
+          <input type="text" id="student_name" name="student_name" value="{{ record['student_name'] }}" required />
+        </div>
+
+        <div class="form-group">
+          <label for="course">Course</label>
+          <input type="text" id="course" name="course" value="{{ record['course'] }}" required />
+        </div>
+
+        <div class="form-group">
+          <label for="grade">Grade</label>
+          <input type="text" id="grade" name="grade" value="{{ record['grade'] }}" required />
+        </div>
+
+        <div class="btn-row">
+          <button type="submit" class="btn-save">Save Changes</button>
+          <a href="{{ url_for('index') }}" class="btn-cancel">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

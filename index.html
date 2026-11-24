@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flask CRUD Manager</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background-color: #f6f5f0;
+      color: #2b3440;
+      padding: 32px 16px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    header {
+      background-color: #e6efe9;
+      border: 1px solid #c9dcd0;
+      border-radius: 14px;
+      padding: 22px 26px;
+      margin-bottom: 22px;
+    }
+
+    header h1 {
+      font-size: 1.6rem;
+      color: #1f3a2d;
+      margin-bottom: 4px;
+    }
+
+    header p {
+      font-size: 0.92rem;
+      color: #4b6357;
+    }
+
+    .panel {
+      background-color: #ffffff;
+      border: 1px solid #e2e6ea;
+      border-radius: 14px;
+      padding: 22px 26px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 14px rgba(43, 52, 64, 0.05);
+    }
+
+    .panel h2 {
+      font-size: 1.15rem;
+      color: #2b3440;
+      margin-bottom: 14px;
+    }
+
+    .alert {
+      padding: 12px 16px;
+      border-radius: 10px;
+      margin-bottom: 18px;
+      font-size: 0.92rem;
+      font-weight: 600;
+    }
+
+    .alert-success {
+      background-color: #e3f3ea;
+      color: #1e5639;
+      border: 1px solid #b6dec7;
+    }
+
+    .alert-error {
+      background-color: #fbe7e5;
+      color: #84251d;
+      border: 1px solid #f2b8b2;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      align-items: end;
+    }
+
+    label {
+      display: block;
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: #475569;
+      margin-bottom: 6px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      background-color: #fafaf8;
+      color: #1e293b;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #6b9ac4;
+      background-color: #ffffff;
+    }
+
+    .btn-add {
+      padding: 10px 18px;
+      background-color: #2f5d46;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-add:hover {
+      background-color: #254a38;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.93rem;
+    }
+
+    th {
+      background-color: #edf2f7;
+      color: #334155;
+      text-align: left;
+      padding: 12px 14px;
+      font-weight: 700;
+      border-bottom: 2px solid #dbe2ea;
+    }
+
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #edf0f2;
+      color: #334155;
+    }
+
+    tr:hover td {
+      background-color: #faf9f5;
+    }
+
+    .grade-pill {
+      display: inline-block;
+      background-color: #e6eff8;
+      color: #2b547e;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .btn-edit {
+      text-decoration: none;
+      background-color: #f3ead8;
+      color: #6e521b;
+      border: 1px solid #e0cfa9;
+      padding: 5px 11px;
+      border-radius: 6px;
+      font-size: 0.84rem;
+      font-weight: 600;
+    }
+
+    .btn-edit:hover {
+      background-color: #eadbc0;
+    }
+
+    .btn-delete {
+      background-color: #fae3e1;
+      color: #8c2d25;
+      border: 1px solid #ecc0bc;
+      padding: 5px 11px;
+      border-radius: 6px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-delete:hover {
+      background-color: #f4ccc8;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 24px;
+      color: #64748b;
+      font-size: 0.94rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Student Course CRUD Manager</h1>
+      <p>Create, view, update, and delete student course records stored in SQLite.</p>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <section class="panel">
+      <h2>Add New Record (Create)</h2>
+      <form method="POST" action="/">
+        <div class="form-grid">
+          <div>
+            <label for="student_name">Student Name</label>
+            <input type="text" id="student_name" name="student_name" placeholder="e.g., Meera Krishnan" required />
+          </div>
+          <div>
+            <label for="course">Course</label>
+            <input type="text" id="course" name="course" placeholder="e.g., Web Programming" required />
+          </div>
+          <div>
+            <label for="grade">Grade</label>
+            <input type="text" id="grade" name="grade" placeholder="e.g., A+" required />
+          </div>
+          <div>
+            <button type="submit" class="btn-add">Add Record</button>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>Existing Records (Read / Update / Delete) &mdash; {{ records|length }}</h2>
+      <div class="table-wrap">
+        {% if records %}
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Student Name</th>
+                <th>Course</th>
+                <th>Grade</th>
+                <th>Updated</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in records %}
+                <tr>
+                  <td>#{{ row["id"] }}</td>
+                  <td><strong>{{ row["student_name"] }}</strong></td>
+                  <td>{{ row["course"] }}</td>
+                  <td><span class="grade-pill">{{ row["grade"] }}</span></td>
+                  <td>{{ row["updated_at"] }}</td>
+                  <td>
+                    <div class="actions">
+                      <a href="{{ url_for('edit_record', record_id=row['id']) }}" class="btn-edit">Edit</a>
+                      <form method="POST" action="{{ url_for('delete_record', record_id=row['id']) }}" style="display:inline;">
+                        <button type="submit" class="btn-delete">Delete</button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <div class="empty-state">No records in the database yet. Add one above to get started.</div>
+        {% endif %}
+      </div>
+    </section>
+  </div>
+</body>
+</html>
